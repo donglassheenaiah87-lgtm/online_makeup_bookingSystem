@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/auth.service';
+import { UserService } from '../../core/user.service';
 
 @Component({
   selector: 'app-admin-login',
@@ -21,7 +22,8 @@ export class AdminLoginComponent {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {}
 
   goTo(role: string) {
@@ -43,8 +45,30 @@ export class AdminLoginComponent {
     this.errorMessage = '';
 
     try {
-      await this.authService.login(this.email, this.password);
+      // Step 1: Firebase Auth login
+      const result = await this.authService.login(this.email, this.password);
+      const uid = result.user.uid;
+
+      // Step 2: Check role in Firestore
+      const userData = await this.userService.getUser(uid);
+
+      if (!userData) {
+        this.errorMessage = 'User data not found. Contact support.';
+        this.isLoading = false;
+        await this.authService.logout();
+        return;
+      }
+
+      if (userData.role !== 'admin') {
+        this.errorMessage = 'Access denied. Admin accounts only.';
+        this.isLoading = false;
+        await this.authService.logout();
+        return;
+      }
+
+      // Step 3: Go to dashboard
       this.router.navigate(['/admin/dashboard']);
+
     } catch (error: any) {
       this.isLoading = false;
       switch (error.code) {
@@ -52,6 +76,8 @@ export class AdminLoginComponent {
           this.errorMessage = 'No account found with this email.'; break;
         case 'auth/wrong-password':
           this.errorMessage = 'Incorrect password.'; break;
+        case 'auth/invalid-credential':
+          this.errorMessage = 'Invalid email or password.'; break;
         case 'auth/invalid-email':
           this.errorMessage = 'Invalid email address.'; break;
         case 'auth/too-many-requests':
