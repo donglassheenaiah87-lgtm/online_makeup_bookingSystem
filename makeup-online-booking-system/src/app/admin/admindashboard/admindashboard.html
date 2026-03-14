@@ -1,0 +1,352 @@
+<div class="dashboard-wrapper">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header">
+      <span class="logo-icon">👑</span>
+      <span class="logo-text" *ngIf="!sidebarCollapsed">GlowBook</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item" [class.active]="activeTab === 'overview'" (click)="setTab('overview')">
+        <span class="nav-icon">◈</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Overview</span>
+      </a>
+      <a class="nav-item" [class.active]="activeTab === 'bookings'" (click)="setTab('bookings')">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Bookings</span>
+      </a>
+      <a class="nav-item" [class.active]="activeTab === 'clients'" (click)="setTab('clients')">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Clients</span>
+      </a>
+      <a class="nav-item" [class.active]="activeTab === 'artists'" (click)="setTab('artists')">
+        <span class="nav-icon">🎨</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Artists</span>
+      </a>
+      <a class="nav-item" [class.active]="activeTab === 'services'" (click)="setTab('services')">
+        <span class="nav-icon">💄</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Services</span>
+      </a>
+      <a class="nav-item" [class.active]="activeTab === 'reports'" (click)="setTab('reports')">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Reports</span>
+      </a>
+      <a class="nav-item" [class.active]="activeTab === 'settings'" (click)="setTab('settings')">
+        <span class="nav-icon">⚙</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="collapse-btn" (click)="sidebarCollapsed = !sidebarCollapsed">
+        {{ sidebarCollapsed ? '▶' : '◀' }}
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title">{{ pageTitle }}</h1>
+        <p class="page-subtitle">{{ pageSubtitle }}</p>
+      </div>
+      <div class="topbar-right">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" />
+        </div>
+        <div class="notif-btn">
+          🔔
+          <span class="notif-badge">3</span>
+        </div>
+        <div class="admin-avatar">
+          <span>👑</span>
+          <div class="avatar-info" *ngIf="!sidebarCollapsed">
+            <p class="avatar-name">Admin</p>
+            <p class="avatar-role">Super Admin</p>
+          </div>
+        </div>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+      </div>
+    </header>
+
+    <!-- ── OVERVIEW TAB ── -->
+    <div class="tab-content" *ngIf="activeTab === 'overview'">
+
+      <div class="stats-grid">
+        <div class="stat-card" *ngFor="let stat of stats">
+          <div class="stat-icon">{{ stat.icon }}</div>
+          <div class="stat-info">
+            <p class="stat-label">{{ stat.label }}</p>
+            <p class="stat-value">{{ stat.value }}</p>
+            <p class="stat-change" [class.positive]="stat.positive">
+              {{ stat.positive ? '▲' : '▼' }} {{ stat.change }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <h3>Recent Bookings</h3>
+            <button class="view-all" (click)="setTab('bookings')">View all →</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Service</th>
+                <th>Artist</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let b of recentBookings">
+                <td>{{ b.client }}</td>
+                <td>{{ b.service }}</td>
+                <td>{{ b.artist }}</td>
+                <td>{{ b.date }}</td>
+                <td><span class="badge" [ngClass]="b.status">{{ b.status }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Top Artists</h3>
+            <button class="view-all" (click)="setTab('artists')">View all →</button>
+          </div>
+          <div class="artist-list">
+            <div class="artist-row" *ngFor="let a of topArtists; let i = index">
+              <span class="artist-rank">{{ i + 1 }}</span>
+              <div class="artist-avatar">{{ a.initials }}</div>
+              <div class="artist-info">
+                <p class="artist-name">{{ a.name }}</p>
+                <p class="artist-specialty">{{ a.specialty }}</p>
+              </div>
+              <div class="artist-stats">
+                <p class="artist-bookings">{{ a.bookings }} bookings</p>
+                <p class="rating">⭐ {{ a.rating }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>Quick Actions</h3></div>
+        <div class="quick-actions">
+          <button class="action-btn" (click)="setTab('bookings')"><span>📋</span> Manage Bookings</button>
+          <button class="action-btn" (click)="setTab('artists')"><span>🎨</span> Add Artist</button>
+          <button class="action-btn" (click)="setTab('services')"><span>💄</span> Add Service</button>
+          <button class="action-btn" (click)="setTab('reports')"><span>📊</span> View Reports</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── BOOKINGS TAB ── -->
+    <div class="tab-content" *ngIf="activeTab === 'bookings'">
+      <div class="card">
+        <div class="card-header">
+          <h3>All Bookings</h3>
+          <select class="filter-select" [(ngModel)]="bookingFilter">
+            <option value="all">All Status</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="pending">Pending</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Client</th><th>Service</th><th>Artist</th>
+              <th>Date & Time</th><th>Amount</th><th>Status</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let b of allBookings; let i = index">
+              <td class="row-num">{{ i + 1 }}</td>
+              <td>{{ b.client }}</td>
+              <td>{{ b.service }}</td>
+              <td>{{ b.artist }}</td>
+              <td>{{ b.date }}</td>
+              <td class="amount">₱{{ b.amount }}</td>
+              <td><span class="badge" [ngClass]="b.status">{{ b.status }}</span></td>
+              <td>
+                <button class="icon-btn edit">✏</button>
+                <button class="icon-btn delete">🗑</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── CLIENTS TAB ── -->
+    <div class="tab-content" *ngIf="activeTab === 'clients'">
+      <div class="card">
+        <div class="card-header">
+          <h3>Client Management</h3>
+          <button class="add-btn">+ Add Client</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Name</th><th>Email</th><th>Phone</th>
+              <th>Total Bookings</th><th>Joined</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of clients; let i = index">
+              <td class="row-num">{{ i + 1 }}</td>
+              <td>{{ c.name }}</td>
+              <td>{{ c.email }}</td>
+              <td>{{ c.phone }}</td>
+              <td>{{ c.bookings }}</td>
+              <td>{{ c.joined }}</td>
+              <td>
+                <button class="icon-btn edit">✏</button>
+                <button class="icon-btn delete">🗑</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ARTISTS TAB ── -->
+    <div class="tab-content" *ngIf="activeTab === 'artists'">
+      <div class="card">
+        <div class="card-header">
+          <h3>Artist Management</h3>
+          <button class="add-btn">+ Add Artist</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Name</th><th>Specialty</th><th>Email</th>
+              <th>Bookings</th><th>Rating</th><th>Status</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let a of artistsList; let i = index">
+              <td class="row-num">{{ i + 1 }}</td>
+              <td>{{ a.name }}</td>
+              <td>{{ a.specialty }}</td>
+              <td>{{ a.email }}</td>
+              <td>{{ a.bookings }}</td>
+              <td>⭐ {{ a.rating }}</td>
+              <td><span class="badge confirmed">active</span></td>
+              <td>
+                <button class="icon-btn edit">✏</button>
+                <button class="icon-btn delete">🗑</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── SERVICES TAB ── -->
+    <div class="tab-content" *ngIf="activeTab === 'services'">
+      <div class="card">
+        <div class="card-header">
+          <h3>Services Management</h3>
+          <button class="add-btn">+ Add Service</button>
+        </div>
+        <div class="services-grid">
+          <div class="service-card" *ngFor="let s of services">
+            <div class="service-icon">{{ s.icon }}</div>
+            <h4>{{ s.name }}</h4>
+            <p class="service-desc">{{ s.desc }}</p>
+            <p class="service-price">₱{{ s.price }}</p>
+            <div class="service-actions">
+              <button class="icon-btn edit">✏ Edit</button>
+              <button class="icon-btn delete">🗑 Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTS TAB ── -->
+    <div class="tab-content" *ngIf="activeTab === 'reports'">
+      <div class="stats-grid">
+        <div class="stat-card" *ngFor="let stat of stats">
+          <div class="stat-icon">{{ stat.icon }}</div>
+          <div class="stat-info">
+            <p class="stat-label">{{ stat.label }}</p>
+            <p class="stat-value">{{ stat.value }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Monthly Revenue Overview</h3></div>
+        <div class="bar-chart">
+          <div class="bar-row" *ngFor="let m of monthlyData">
+            <span class="bar-label">{{ m.month }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="(m.revenue / 30000) * 100">
+                <span class="bar-value">₱{{ m.revenue | number }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS TAB ── -->
+    <div class="tab-content" *ngIf="activeTab === 'settings'">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><h3>Account Settings</h3></div>
+          <div class="settings-form">
+            <div class="form-group">
+              <label>Admin Name</label>
+              <input type="text" value="Super Admin" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" value="admin@glowbook.com" />
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" placeholder="••••••••" />
+            </div>
+            <button class="save-btn">Save Changes</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>System Settings</h3></div>
+          <div class="settings-form">
+            <div class="form-group">
+              <label>Business Name</label>
+              <input type="text" value="GlowBook" />
+            </div>
+            <div class="form-group">
+              <label>Booking Lead Time (hours)</label>
+              <input type="number" value="24" />
+            </div>
+            <div class="form-group">
+              <label>Currency</label>
+              <select>
+                <option>PHP (₱)</option>
+                <option>USD ($)</option>
+              </select>
+            </div>
+            <button class="save-btn">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
