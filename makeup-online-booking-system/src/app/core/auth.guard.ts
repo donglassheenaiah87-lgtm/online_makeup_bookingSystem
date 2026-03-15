@@ -1,21 +1,33 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { Auth, user } from '@angular/fire/auth';
-import { map, take } from 'rxjs/operators';
+import { Auth } from '@angular/fire/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 
-export const authGuard: CanActivateFn = () => {
-  const auth = inject(Auth);
+export const authGuard: CanActivateFn = (route, state) => {
+  const auth   = inject(Auth);
   const router = inject(Router);
 
-  return user(auth).pipe(
-    take(1),
-    map(currentUser => {
-      if (currentUser) {
-        return true;
+  // ── Allow guest access to client dashboard only ──
+  const isGuest = sessionStorage.getItem('guestMode') === 'true';
+  if (isGuest && state.url.startsWith('/client/dashboard')) {
+    return true;
+  }
+
+  return new Promise((resolve) => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        resolve(true);
       } else {
-        router.navigate(['/admin/login']);
-        return false;
+        // Redirect to the correct login page based on the route
+        if (state.url.startsWith('/artist')) {
+          router.navigate(['/artist/login']);
+        } else if (state.url.startsWith('/admin')) {
+          router.navigate(['/admin/login']);
+        } else {
+          router.navigate(['/client/login']);
+        }
+        resolve(false);
       }
-    })
-  );
+    });
+  });
 };

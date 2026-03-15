@@ -57,15 +57,15 @@
 
       <p class="error-msg" *ngIf="errorMessage">⚠ {{ errorMessage }}</p>
 
-      <button type="submit" class="btn-login">
-        <span>Sign In as Artist</span>
-        <span class="btn-arrow">→</span>
+      <button type="submit" class="btn-login" [disabled]="isLoading">
+        <span>{{ isLoading ? 'Signing in...' : 'Sign In as Artist' }}</span>
+        <span class="btn-arrow" *ngIf="!isLoading">→</span>
       </button>
 
     </form>
 
     <div class="divider"><span>or</span></div>
-    <p class="register-link">New artist? <a routerLink="/register">Apply here</a></p>
+    <p class="register-link">New artist? <a routerLink="/artist/register">Apply here</a></p>
     <p class="footer-note">✦ Create beauty, inspire confidence</p>
 
   </div>

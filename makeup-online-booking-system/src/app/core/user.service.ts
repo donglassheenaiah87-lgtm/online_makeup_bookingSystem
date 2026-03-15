@@ -16,6 +16,8 @@ export interface UserData {
   uid: string;
   name: string;
   email: string;
+  phone: string;
+  specialty?: string;
   role: 'admin' | 'artist' | 'client';
   createdAt: Date;
 }

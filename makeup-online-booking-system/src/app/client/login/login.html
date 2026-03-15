@@ -57,15 +57,20 @@
 
       <p class="error-msg" *ngIf="errorMessage">⚠ {{ errorMessage }}</p>
 
-      <button type="submit" class="btn-login">
-        <span>Sign In as Client</span>
-        <span class="btn-arrow">→</span>
+      <button type="submit" class="btn-login" [disabled]="isLoading">
+        <span>{{ isLoading ? 'Signing in...' : 'Sign In as Client' }}</span>
+        <span class="btn-arrow" *ngIf="!isLoading">→</span>
       </button>
 
     </form>
 
+    <button class="btn-guest" (click)="continueAsGuest()">
+      <span class="guest-icon">👤</span>
+      <span>Continue as Guest</span>
+    </button>
+
     <div class="divider"><span>or</span></div>
-    <p class="register-link">New here? <a routerLink="/register">Create an account</a></p>
+    <p class="register-link">New here? <a routerLink="/client/register">Create an account</a></p>
     <p class="footer-note">✨ Beauty starts with a booking</p>
 
   </div>

@@ -35,6 +35,12 @@ export class ClientLoginComponent {
     this.router.navigate([map[role]]);
   }
 
+  // ── Guest Access ──
+  continueAsGuest() {
+    sessionStorage.setItem('guestMode', 'true');
+    this.router.navigate(['/client/dashboard']);
+  }
+
   async onLogin() {
     if (!this.email || !this.password) {
       this.errorMessage = 'Please fill in all fields.';
@@ -66,7 +72,8 @@ export class ClientLoginComponent {
         return;
       }
 
-      // Step 3: Go to client dashboard
+      // Step 3: Clear guest mode if any, then go to dashboard
+      sessionStorage.removeItem('guestMode');
       this.router.navigate(['/client/dashboard']);
 
     } catch (error: any) {
